@@ -1,5 +1,3 @@
-<svelte:options tag="svelte-autocompleter"/>
-
 <script>
   import AutocompleterInput from './AutocompleterInput.svelte';
   import { onMount } from 'svelte';

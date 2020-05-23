@@ -1,4 +1,3 @@
-<svelte:options tag="svelte-autocompleter-input"/>
 <script>
   import { createEventDispatcher } from 'svelte';
 
