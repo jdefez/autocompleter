@@ -2,7 +2,7 @@
 
 # Usage
 
-This component initialy based on
+This component is based on
 [sveltejs/component-template](https://github.com/sveltejs/component-template)
 
 ## Consuming components
