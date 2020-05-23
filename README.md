@@ -2,11 +2,8 @@
 
 # Usage
 
-based on [sveltejs/component-template](https://github.com/sveltejs/component-template)
-
-```bash
-npm install # or yarn
-```
+This component initialy based on
+[sveltejs/component-template](https://github.com/sveltejs/component-template)
 
 ## Consuming components
 
