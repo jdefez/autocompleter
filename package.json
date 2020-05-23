@@ -14,7 +14,8 @@
     "svelte": "^3.0.0"
   },
   "keywords": [
-    "svelte", "autocomplete"
+    "svelte",
+    "autocomplete"
   ],
   "files": [
     "src",
