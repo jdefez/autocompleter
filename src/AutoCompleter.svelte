@@ -16,8 +16,8 @@
   let listElement = null;
   onMount(() => {
     listElement = document.querySelector('.autocompleter__list');
-
   });
+
   let dataList = [];
   let index = 0;
 
@@ -172,6 +172,7 @@
     {/if}
 </span>
 <style type="text/css">
+  /* todo: check about using :host in here */
   .autocompleter {
     position: relative;
     box-sizing: border-box;
@@ -191,7 +192,6 @@
     background-color: white;
     max-height: 250px;
     overflow-y: scroll;
-
   }
   .autocompleter__list.is--hidden {
     visibility: hidden;
