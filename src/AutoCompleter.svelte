@@ -2,8 +2,10 @@
 
 <script>
   import AutocompleterInput from './AutocompleterInput.svelte';
+  import AutocompleterListItem from './AutocompleterListItem.svelte';
   import { onMount } from 'svelte';
 
+  export let renderlistitem = null;
   export let onkeyupfilter = (item, show) => item.includes(show);
   export let onselected = (item) => { return {'show': item, 'output': item}; };
   export let oncleared = null;
@@ -162,11 +164,10 @@
     <span class="autocompleter__list"
       class:is--hidden={dataList.length === 0}>
       {#each dataList as item, i }
-      <span class="autocompleter__list_item"
-        class:is--highlighted={i === index}
-        on:click={click}>
-        <slot name="list-item" {item}></slot>
-      </span>
+      <AutocompleterListItem template={renderlistitem}
+        data={item}
+        highlighted={i === index}
+        on:click={click}/>
       {/each}
     </span>
     {/if}
@@ -195,15 +196,5 @@
   }
   .autocompleter__list.is--hidden {
     visibility: hidden;
-  }
-  .autocompleter__list_item {
-    padding: 5px;
-    width: 100%;
-  }
-  .autocompleter__list_item + .autocompleter__list_item {
-    border-top: 1px solid #ccc;
-  }
-  .autocompleter__list_item.is--highlighted {
-    background-color: #eee;
   }
 </style>
