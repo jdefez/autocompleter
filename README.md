@@ -1,5 +1,9 @@
 This is a attempt to build a web component from svelte
 
+## commands
+build: `npm run build`
+start server: `http-server -p 8080 -c-1 dist/`
+
 **Todo:**
  - No javascript variables in slots
  - Removing all the attributes that are javascript callbacks and that are used for configuration
