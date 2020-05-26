@@ -19,18 +19,22 @@
   };
   afterUpdate(() => renderInner(template, data));
 </script>
-<span class="autocompleter__list-item"
+<span class="autocompleter__list_item"
   bind:this={me}
   class:is--highlighted={highlighted}></span>
 <style type="text/css">
-  .autocompleter__list-item {
+  .autocompleter__list_item {
+    box-sizing: border-box;
+    display: block;
+  }
+  .autocompleter__list_item {
     padding: 5px;
     width: 100%;
   }
-  .autocompleter__list-item + .autocompleter__list-item {
+  .autocompleter__list_item + .autocompleter__list_item {
     border-top: 1px solid #ccc;
   }
-  .autocompleter__list-item.is--highlighted {
+  .autocompleter__list_item.is--highlighted {
     background-color: #eee;
   }
 </style>

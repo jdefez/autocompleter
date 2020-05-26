@@ -1,7 +1,8 @@
 <svelte:options tag="svelte-autocompleter"/>
 
 <script>
-  import AutocompleterInput from './AutocompleterInput.svelte';
+  // import AutocompleterInput from './AutocompleterInput.svelte';
+  import { listitem } from './listitem.js';
   import AutocompleterListItem from './AutocompleterListItem.svelte';
   import { onMount } from 'svelte';
 
@@ -10,18 +11,20 @@
   export let onselected = (item) => { return {'show': item, 'output': item}; };
   export let oncleared = null;
 
+  export let placeholder = 'Enter some key words ...';
   export let datasource = null;
   export let output = null;
   export let show = null;
   export let name = null;
 
-  let listElement = null;
-  onMount(() => {
-    listElement = document.querySelector('.autocompleter__list');
-  });
-
   let dataList = [];
   let index = 0;
+  let me;
+
+  let listElement = null;
+  onMount(() => {
+    listElement = me.querySelector('.autocompleter__list');
+  });
 
   const dataSourceIsRequest = () => {
     if (typeof datasource === 'function') {
@@ -67,13 +70,18 @@
 
   const keyup = () => {
     if (dataSourceIsRequest()) {
+      dataList = [];
       fetch(datasource(show))
         .then((response) => response.json())
         .then((json) => {
           if (!json || !Array.isArray(json)) {
             json = [];
           }
-          dataList = json
+          if (typeof onkeyupfilter === 'function') {
+            dataList = json.filter((item) => onkeyupfilter(item, show));
+          } else {
+            dataList = json;
+          }
         })
         .catch((error) => console.log(error));
     } else {
@@ -92,13 +100,41 @@
   }
 
   const clear = () => {
-    reset();
-    output = '';
-    if (typeof oncleared === 'function') {
-      oncleared();
+    if (show !== '') {
+      show = '';
+      reset();
+      output = '';
+      if (typeof oncleared === 'function') {
+        oncleared();
+      }
     }
   }
 
+  const handleKeyup = (event) => {
+    const key = event.key;
+    if (!['Enter', 'Escape', 'ArrowDown', 'ArrowUp'].includes(key)) {
+      if (show) {
+        keyup();
+      } else {
+        clear();
+      }
+    }
+  }
+
+  const handleKeydown = (event) => {
+    const key = event.key;
+    if (key === 'Enter') {
+      select();
+    } else if (key === 'Escape') {
+      clear();
+    } else if (key === 'ArrowDown') {
+      next();
+    } else if (key === 'ArrowUp') {
+      previous();
+    }
+  }
+
+  // list navigation
   const next = () => {
     const lastIndex = listElement.childNodes.length - 1;
     if (index + 1 <= lastIndex) {
@@ -150,27 +186,37 @@
   const scrollToPrevious = (index) => {
     return scrollTo(index, 'previous');
   }
+
+  // list item
+  const renderListItemContent = (template, data) => {
+    if (!template && typeof data === 'string') {
+      return data;
+    } else if (typeof template === 'function') {
+      return template(data);
+    }
+  };
 </script>
-<span class="autocompleter">
-  <AutocompleterInput {name}
-    bind:show={show}
-    bind:output={output}
-    on:autocompleterSelectPrevious={previous}
-    on:autocompleterSelectNext={next}
-    on:autocompleterSelect={select}
-    on:autocompleterKeyup={keyup}
-    on:autocompleterClear={clear}/>
-    {#if dataList && dataList.length }
-    <span class="autocompleter__list"
-      class:is--hidden={dataList.length === 0}>
-      {#each dataList as item, i }
-      <AutocompleterListItem template={renderlistitem}
-        data={item}
-        highlighted={i === index}
-        on:click={click}/>
-      {/each}
-    </span>
-    {/if}
+<span class="autocompleter"
+  bind:this={me}>
+  <input placeholder={placeholder}
+    on:keydown={handleKeydown}
+    on:keyup={handleKeyup}
+    bind:value={show}
+    class="autocompleter__input"
+    name="autocompleter__input"
+    type="text">
+  <input type="hidden"
+    name={name}
+    output={output}>
+  <span class="autocompleter__list"
+    class:is--hidden={dataList.length === 0}>
+    {#each dataList as item, i }
+    <span class="autocompleter__list_item"
+      use:listitem={renderListItemContent(renderlistitem, item)}
+      class:is--highlighted={i === index}
+      on:click={click}>{ i }</span>
+    {/each}
+  </span>
 </span>
 <style type="text/css">
   /* todo: check about using :host in here */
@@ -178,6 +224,14 @@
     position: relative;
     box-sizing: border-box;
     display: block;
+  }
+  .autocompleter__input {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 5px;
   }
   .autocompleter__list,
   .autocompleter__list_item {
@@ -196,5 +250,15 @@
   }
   .autocompleter__list.is--hidden {
     visibility: hidden;
+  }
+  .autocompleter__list_item {
+    padding: 5px;
+    width: 100%;
+  }
+  .autocompleter__list_item + .autocompleter__list_item {
+    border-top: 1px solid #ccc;
+  }
+  .autocompleter__list_item.is--highlighted {
+    background-color: #eee;
   }
 </style>
