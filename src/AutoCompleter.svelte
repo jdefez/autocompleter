@@ -2,8 +2,6 @@
 
 <script>
   import { listitem } from './listitem.js';
-  import AutocompleterListItem from './AutocompleterListItem.svelte';
-  import { onMount } from 'svelte';
 
   export let renderlistitem = (item) => item;
   export let onkeyupfilter = (item, show) => item.includes(show);
@@ -16,14 +14,10 @@
   export let show = null;
   export let name = null;
 
+  let listElement = null;
   let dataList = [];
   let index = 0;
-  let me;
 
-  let listElement = null;
-  onMount(() => {
-    listElement = me.querySelector('.autocompleter__list');
-  });
 
   const dataSourceIsRequest = () => {
     if (typeof datasource === 'function') {
@@ -195,31 +189,28 @@
     }
   };
 </script>
-<span class="autocompleter"
-  bind:this={me}>
-  <input placeholder={placeholder}
-    on:keydown={handleKeydown}
-    on:keyup={handleKeyup}
-    bind:value={show}
-    class="autocompleter__input"
-    name="autocompleter__input"
-    type="text">
-  <input type="hidden"
-    name={name}
-    output={output}>
-  <span class="autocompleter__list"
-    class:is--hidden={dataList.length === 0}>
-    {#each dataList as item, i }
-    <span class="autocompleter__list_item"
-      use:listitem={renderListItemContent(renderlistitem, item)}
-      class:is--highlighted={i === index}
-      on:click={click}>{ i }</span>
-    {/each}
-  </span>
+<input placeholder={placeholder}
+  on:keydown={handleKeydown}
+  on:keyup={handleKeyup}
+  bind:value={show}
+  class="autocompleter__input"
+  name="autocompleter__input"
+  type="text">
+<input type="hidden"
+  name={name}
+  output={output}>
+<span class="autocompleter__list"
+  bind:this={listElement}
+  class:is--hidden={dataList.length === 0}>
+  {#each dataList as item, i }
+  <span class="autocompleter__list_item"
+    use:listitem={renderListItemContent(renderlistitem, item)}
+    class:is--highlighted={i === index}
+    on:click={click}>{ i }</span>
+  {/each}
 </span>
 <style type="text/css">
-  /* todo: check about using :host in here */
-  .autocompleter {
+  :host {
     position: relative;
     box-sizing: border-box;
     display: block;
