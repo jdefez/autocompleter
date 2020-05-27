@@ -192,7 +192,6 @@
   on:keydown={handleKeydown}
   on:keyup={handleKeyup}
   bind:value={show}
-  class="autocompleter__input"
   name="autocompleter__input"
   type="text">
 <input type="hidden"
@@ -210,9 +209,10 @@
 </span>
 <style type="text/css">
   :host {
+    all: initial;
+    display: block;
     position: relative;
     box-sizing: border-box;
-    display: block;
   }
   :host > input {
     box-sizing: border-box;
@@ -221,29 +221,41 @@
     max-width: 100%;
     margin: 0;
     padding: 5px;
+    border-width: var(--input-border-width, 1px);
+    border-style: var(--input-border-style, solid);
+    border-color: var(--input-border-color, #cccccc);
+    background-color: var(--input-background-color, white);
   }
   .list,
   .list-item {
     box-sizing: border-box;
     display: block;
   }
-  .list {
+  :host > .list {
     position: absolute;
     top: 100%;
     width: 100%;
     max-width: 100%;
-    border: 1px solid #ccc;
-    background-color: white;
-    max-height: 250px;
+    border-width: var(--list-border-width, 1px);
+    border-style: var(--list-border-style, solid);
+    border-color: var(--list-border-color, #cccccc);
+    border-radius: var(--list-border-color, 0 0 0 0);
+    max-height: var(--list-max-height, 250px);
     overflow-y: scroll;
   }
-  .list-item {
-    padding: 5px;
+  :host .list-item {
+    padding: var(--listitem-padding, 5px);
+    background-color: var(--listitem-background-color, white);
     width: 100%;
   }
-  .list-item + .list-item {
-    border-top: 1px solid #ccc;
+  :host .list-item + .list-item {
+    border-width: var(--listitem-border-width, 1px 0 0 0);
+    border-style: var(--listitem-border-style, solid);
+    border-color: var(--listitem-border-color, #cccccc);
   }
+
   .list.is--hidden { visibility: hidden; }
-  .list-item.is--highlighted { background-color: #eee; }
+  .list-item.is--highlighted {
+    background-color: var(--listitem-highlighted-background-color, #eeeeee);
+  }
 </style>
