@@ -1,12 +1,11 @@
 <svelte:options tag="svelte-autocompleter"/>
 
 <script>
-  // import AutocompleterInput from './AutocompleterInput.svelte';
   import { listitem } from './listitem.js';
   import AutocompleterListItem from './AutocompleterListItem.svelte';
   import { onMount } from 'svelte';
 
-  export let renderlistitem = null;
+  export let renderlistitem = (item) => item;
   export let onkeyupfilter = (item, show) => item.includes(show);
   export let onselected = (item) => { return {'show': item, 'output': item}; };
   export let oncleared = null;
