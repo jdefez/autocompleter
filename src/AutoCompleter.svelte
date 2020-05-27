@@ -18,7 +18,6 @@
   let dataList = [];
   let index = 0;
 
-
   const dataSourceIsRequest = () => {
     if (typeof datasource === 'function') {
       try {
@@ -199,11 +198,11 @@
 <input type="hidden"
   name={name}
   output={output}>
-<span class="autocompleter__list"
+<span class="list"
   bind:this={listElement}
   class:is--hidden={dataList.length === 0}>
   {#each dataList as item, i }
-  <span class="autocompleter__list_item"
+  <span class="list-item"
     use:listitem={renderListItemContent(renderlistitem, item)}
     class:is--highlighted={i === index}
     on:click={click}>{ i }</span>
@@ -215,7 +214,7 @@
     box-sizing: border-box;
     display: block;
   }
-  .autocompleter__input {
+  :host > input {
     box-sizing: border-box;
     display: block;
     width: 100%;
@@ -223,12 +222,12 @@
     margin: 0;
     padding: 5px;
   }
-  .autocompleter__list,
-  .autocompleter__list_item {
+  .list,
+  .list-item {
     box-sizing: border-box;
     display: block;
   }
-  .autocompleter__list {
+  .list {
     position: absolute;
     top: 100%;
     width: 100%;
@@ -238,17 +237,13 @@
     max-height: 250px;
     overflow-y: scroll;
   }
-  .autocompleter__list.is--hidden {
-    visibility: hidden;
-  }
-  .autocompleter__list_item {
+  .list-item {
     padding: 5px;
     width: 100%;
   }
-  .autocompleter__list_item + .autocompleter__list_item {
+  .list-item + .list-item {
     border-top: 1px solid #ccc;
   }
-  .autocompleter__list_item.is--highlighted {
-    background-color: #eee;
-  }
+  .list.is--hidden { visibility: hidden; }
+  .list-item.is--highlighted { background-color: #eee; }
 </style>
