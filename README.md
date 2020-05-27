@@ -2,7 +2,7 @@ This is a attempt to build a web component from svelte
 
 ## commands
 build: `npm run build`
-start server: `http-server -p 8080 -c-1 dist/`
+start server: `npm run serve`
 
 **Todo:**
  - Resolve the onSelected and onCleared callbacks
