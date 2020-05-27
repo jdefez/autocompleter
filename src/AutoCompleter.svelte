@@ -133,7 +133,7 @@
     }
   }
 
-  // list navigation
+  // List navigation
   const next = () => {
     const lastIndex = listElement.childNodes.length - 1;
     if (index + 1 <= lastIndex) {
@@ -186,7 +186,7 @@
     return scrollTo(index, 'previous');
   }
 
-  // list item
+  // List item
   const renderListItemContent = (template, data) => {
     if (!template && typeof data === 'string') {
       return data;
