@@ -1,8 +1,6 @@
 <svelte:options tag="svelte-autocompleter"/>
 
 <script>
-  import { listitem } from './listitem.js';
-
   export let renderlistitem = (item) => item;
   export let onkeyupfilter = (item, show) => item.includes(show);
   export let onselected = (item) => { return {'show': item, 'output': item}; };
@@ -202,9 +200,10 @@
   class:is--hidden={dataList.length === 0}>
   {#each dataList as item, i }
   <span class="list-item"
-    use:listitem={renderListItemContent(renderlistitem, item)}
     class:is--highlighted={i === index}
-    on:click={click}>{ i }</span>
+    on:click={click}>
+    {@html renderListItemContent(renderlistitem, item)}
+  </span>
   {/each}
 </span>
 <style type="text/css">
