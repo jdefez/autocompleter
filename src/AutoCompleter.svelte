@@ -1,10 +1,11 @@
 <svelte:options tag="svelte-autocompleter"/>
 
 <script>
+  import { get_current_component } from 'svelte/internal';
+
   export let renderlistitem = (item) => item;
   export let onkeyupfilter = (item, show) => item.includes(show);
   export let onselected = (item) => { return {'show': item, 'output': item}; };
-  export let oncleared = null;
 
   export let placeholder = 'Enter some key words ...';
   export let datasource = null;
@@ -15,6 +16,7 @@
   let listElement = null;
   let dataList = [];
   let index = 0;
+  let host = get_current_component();
 
   const dataSourceIsRequest = () => {
     if (typeof datasource === 'function') {
@@ -45,6 +47,11 @@
       show = selected.show;
       output = selected.output;
       reset();
+
+      host.dispatchEvent(new CustomEvent(
+        'AUTOCOMPLETER:SELECTED',
+        {detail: {show, output}}
+      ));
 
     } catch (e) {
       console.error(e);
@@ -94,9 +101,8 @@
       show = '';
       reset();
       output = '';
-      if (typeof oncleared === 'function') {
-        oncleared();
-      }
+
+      host.dispatchEvent(new CustomEvent('AUTOCOMPLETER:CLEARED'));
     }
   }
 
@@ -246,6 +252,7 @@
     padding: var(--listitem-padding, 5px);
     background-color: var(--listitem-background-color, white);
     width: 100%;
+    cursor: pointer;
   }
   :host .list-item + .list-item {
     border-width: var(--listitem-border-width, 1px 0 0 0);
