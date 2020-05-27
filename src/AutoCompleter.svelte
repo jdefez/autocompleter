@@ -55,7 +55,7 @@
     const target = event.target;
     const elements = listElement.childNodes;
     index = Array.prototype.indexOf.call(elements, target);
-    dispatch('autocompleterSelect');
+    return select();
   }
 
   const keyup = () => {
