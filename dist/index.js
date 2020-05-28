@@ -312,7 +312,7 @@
     	return child_ctx;
     }
 
-    // (207:2) {#each dataList as item, i }
+    // (211:2) {#each dataList as item, i }
     function create_each_block(ctx) {
     	let span;
     	let html_tag;
@@ -570,6 +570,7 @@
 
     	const handleKeyup = event => {
     		const key = event.key;
+    		console.log("key", key);
 
     		if (!["Enter", "Escape", "ArrowDown", "ArrowUp"].includes(key)) {
     			if (show) {
@@ -582,6 +583,10 @@
 
     	const handleKeydown = event => {
     		const key = event.key;
+
+    		if (["Alt", "Meta", "Control"].includes(key)) {
+    			return;
+    		}
 
     		if (key === "Enter") {
     			select();

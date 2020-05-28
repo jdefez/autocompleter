@@ -1,5 +1,4 @@
 <svelte:options tag="svelte-autocompleter"/>
-
 <script>
   import { get_current_component } from 'svelte/internal';
 
@@ -119,6 +118,10 @@
 
   const handleKeydown = (event) => {
     const key = event.key;
+    if (['Alt', 'Meta', 'Control'].includes(key)) {
+      return;
+    }
+
     if (key === 'Enter') {
       select();
     } else if (key === 'Escape') {
