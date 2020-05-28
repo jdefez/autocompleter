@@ -3,7 +3,7 @@
   import { get_current_component } from 'svelte/internal';
 
   export let renderlistitem = (item) => item;
-  export let onkeyupfilter = (item, show) => item.includes(show);
+  export let onkeyupfilter = (item) => item.includes(show);
   export let onselected = (item) => { return {'show': item, 'output': item}; };
 
   export let placeholder = 'Enter some key words ...';
@@ -19,18 +19,17 @@
 
   const dataSourceIsRequest = () => {
     if (typeof datasource === 'function') {
-      try {
-        const source = datasource(show);
-        if (!source instanceof Request) {
-          throw '@param datasource has to be a Request object';
-        }
-        return true;
-      } catch (e) {
-        console.error(e);
-        return false;
-      }
+      const source = datasource(show);
+      return source instanceof Request;
     }
   };
+
+  const dataSourceIsArray = () => {
+    if (typeof datasource === 'function') {
+      const source = datasource();
+      return Array.isArray(source);
+    }
+  }
 
   const select = () => {
     try {
@@ -80,11 +79,12 @@
           }
         })
         .catch((error) => console.log(error));
-    } else {
-      if (dataList && !dataList.length) {
-        dataList = datasource;
+
+    } else if (dataSourceIsArray()) {
+      if (dataList.length === 0) {
+        dataList = datasource();
       }
-      if (dataList && dataList.length && typeof onkeyupfilter === 'function') {
+      if (typeof onkeyupfilter === 'function') {
         dataList = dataList.filter((item) => onkeyupfilter(item, show));
       }
     }
@@ -222,6 +222,9 @@
     position: relative;
     box-sizing: border-box;
   }
+  :host(.inline) {
+    display: inline-block;
+  }
   :host > input {
     box-sizing: border-box;
     display: block;
@@ -232,6 +235,7 @@
     border-width: var(--input-border-width, 1px);
     border-style: var(--input-border-style, solid);
     border-color: var(--input-border-color, #cccccc);
+    border-radius: var(--input-border-radius, 0 0 0 0);
     background-color: var(--input-background-color, white);
   }
   .list,
@@ -247,7 +251,7 @@
     border-width: var(--list-border-width, 1px);
     border-style: var(--list-border-style, solid);
     border-color: var(--list-border-color, #cccccc);
-    border-radius: var(--list-border-color, 0 0 0 0);
+    border-radius: var(--list-border-radius, 0 0 0 0);
     max-height: var(--list-max-height, 250px);
     overflow-y: scroll;
   }
