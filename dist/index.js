@@ -307,16 +307,16 @@
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[29] = list[i];
-    	child_ctx[31] = i;
+    	child_ctx[30] = list[i];
+    	child_ctx[32] = i;
     	return child_ctx;
     }
 
-    // (211:2) {#each dataList as item, i }
+    // (210:2) {#each dataList as item, i }
     function create_each_block(ctx) {
     	let span;
     	let html_tag;
-    	let raw_value = /*renderListItemContent*/ ctx[11](/*renderlistitem*/ ctx[2], /*item*/ ctx[29]) + "";
+    	let raw_value = /*renderListItemContent*/ ctx[11](/*renderlistitem*/ ctx[2], /*item*/ ctx[30]) + "";
     	let t;
     	let dispose;
 
@@ -326,7 +326,7 @@
     			t = space();
     			html_tag = new HtmlTag(raw_value, t);
     			attr(span, "class", "list-item");
-    			toggle_class(span, "is--highlighted", /*i*/ ctx[31] === /*index*/ ctx[7]);
+    			toggle_class(span, "is--highlighted", /*i*/ ctx[32] === /*index*/ ctx[7]);
     		},
     		m(target, anchor, remount) {
     			insert(target, span, anchor);
@@ -336,10 +336,10 @@
     			dispose = listen(span, "click", /*click*/ ctx[8]);
     		},
     		p(ctx, dirty) {
-    			if (dirty[0] & /*renderlistitem, dataList*/ 68 && raw_value !== (raw_value = /*renderListItemContent*/ ctx[11](/*renderlistitem*/ ctx[2], /*item*/ ctx[29]) + "")) html_tag.p(raw_value);
+    			if (dirty[0] & /*renderlistitem, dataList*/ 68 && raw_value !== (raw_value = /*renderListItemContent*/ ctx[11](/*renderlistitem*/ ctx[2], /*item*/ ctx[30]) + "")) html_tag.p(raw_value);
 
     			if (dirty[0] & /*index*/ 128) {
-    				toggle_class(span, "is--highlighted", /*i*/ ctx[31] === /*index*/ ctx[7]);
+    				toggle_class(span, "is--highlighted", /*i*/ ctx[32] === /*index*/ ctx[7]);
     			}
     		},
     		d(detaching) {
@@ -397,13 +397,13 @@
     				each_blocks[i].m(span, null);
     			}
 
-    			/*span_binding*/ ctx[28](span);
+    			/*span_binding*/ ctx[29](span);
     			if (remount) run_all(dispose);
 
     			dispose = [
     				listen(input0, "keydown", /*handleKeydown*/ ctx[10]),
     				listen(input0, "keyup", /*handleKeyup*/ ctx[9]),
-    				listen(input0, "input", /*input0_input_handler*/ ctx[27])
+    				listen(input0, "input", /*input0_input_handler*/ ctx[28])
     			];
     		},
     		p(ctx, dirty) {
@@ -459,7 +459,7 @@
     			if (detaching) detach(t1);
     			if (detaching) detach(span);
     			destroy_each(each_blocks, detaching);
-    			/*span_binding*/ ctx[28](null);
+    			/*span_binding*/ ctx[29](null);
     			run_all(dispose);
     		}
     	};
@@ -467,7 +467,7 @@
 
     function instance($$self, $$props, $$invalidate) {
     	let { renderlistitem = item => item } = $$props;
-    	let { onkeyupfilter = (item, show) => item.includes(show) } = $$props;
+    	let { onkeyupfilter = item => item.includes(show) } = $$props;
 
     	let { onselected = item => {
     		return { "show": item, "output": item };
@@ -485,18 +485,15 @@
 
     	const dataSourceIsRequest = () => {
     		if (typeof datasource === "function") {
-    			try {
-    				const source = datasource(show);
+    			const source = datasource(show);
+    			return source instanceof Request;
+    		}
+    	};
 
-    				if (!source instanceof Request) {
-    					throw "@param datasource has to be a Request object";
-    				}
-
-    				return true;
-    			} catch(e) {
-    				console.error(e);
-    				return false;
-    			}
+    	const dataSourceIsArray = () => {
+    		if (typeof datasource === "function") {
+    			const source = datasource();
+    			return Array.isArray(source);
     		}
     	};
 
@@ -543,12 +540,12 @@
     					$$invalidate(6, dataList = json);
     				}
     			}).catch(error => console.log(error));
-    		} else {
-    			if (dataList && !dataList.length) {
-    				$$invalidate(6, dataList = datasource);
+    		} else if (dataSourceIsArray()) {
+    			if (dataList.length === 0) {
+    				$$invalidate(6, dataList = datasource());
     			}
 
-    			if (dataList && dataList.length && typeof onkeyupfilter === "function") {
+    			if (typeof onkeyupfilter === "function") {
     				$$invalidate(6, dataList = dataList.filter(item => onkeyupfilter(item, show)));
     			}
     		}
@@ -570,7 +567,6 @@
 
     	const handleKeyup = event => {
     		const key = event.key;
-    		console.log("key", key);
 
     		if (!["Enter", "Escape", "ArrowDown", "ArrowUp"].includes(key)) {
     			if (show) {
@@ -707,6 +703,7 @@
     		datasource,
     		host,
     		dataSourceIsRequest,
+    		dataSourceIsArray,
     		select,
     		keyup,
     		reset,
@@ -725,7 +722,7 @@
     class Autocompleter extends SvelteElement {
     	constructor(options) {
     		super();
-    		this.shadowRoot.innerHTML = `<style>:host{all:initial;display:block;position:relative;box-sizing:border-box}:host>input{box-sizing:border-box;display:block;width:100%;max-width:100%;margin:0;padding:5px;border-width:var(--input-border-width, 1px);border-style:var(--input-border-style, solid);border-color:var(--input-border-color, #cccccc);background-color:var(--input-background-color, white)}.list,.list-item{box-sizing:border-box;display:block}:host>.list{position:absolute;top:100%;width:100%;max-width:100%;border-width:var(--list-border-width, 1px);border-style:var(--list-border-style, solid);border-color:var(--list-border-color, #cccccc);border-radius:var(--list-border-color, 0 0 0 0);max-height:var(--list-max-height, 250px);overflow-y:scroll}:host .list-item{padding:var(--listitem-padding, 5px);background-color:var(--listitem-background-color, white);width:100%;cursor:pointer}:host .list-item+.list-item{border-width:var(--listitem-border-width, 1px 0 0 0);border-style:var(--listitem-border-style, solid);border-color:var(--listitem-border-color, #cccccc)}.list.is--hidden{visibility:hidden}.list-item.is--highlighted{background-color:var(--listitem-highlighted-background-color, #eeeeee)}</style>`;
+    		this.shadowRoot.innerHTML = `<style>:host{all:initial;display:block;position:relative;box-sizing:border-box}:host(.inline){display:inline-block}:host>input{box-sizing:border-box;display:block;width:100%;max-width:100%;margin:0;padding:5px;border-width:var(--input-border-width, 1px);border-style:var(--input-border-style, solid);border-color:var(--input-border-color, #cccccc);border-radius:var(--input-border-radius, 0 0 0 0);background-color:var(--input-background-color, white)}.list,.list-item{box-sizing:border-box;display:block}:host>.list{position:absolute;top:100%;width:100%;max-width:100%;border-width:var(--list-border-width, 1px);border-style:var(--list-border-style, solid);border-color:var(--list-border-color, #cccccc);border-radius:var(--list-border-radius, 0 0 0 0);max-height:var(--list-max-height, 250px);overflow-y:scroll}:host .list-item{padding:var(--listitem-padding, 5px);background-color:var(--listitem-background-color, white);width:100%;cursor:pointer}:host .list-item+.list-item{border-width:var(--listitem-border-width, 1px 0 0 0);border-style:var(--listitem-border-style, solid);border-color:var(--listitem-border-color, #cccccc)}.list.is--hidden{visibility:hidden}.list-item.is--highlighted{background-color:var(--listitem-highlighted-background-color, #eeeeee)}</style>`;
 
     		init(
     			this,
