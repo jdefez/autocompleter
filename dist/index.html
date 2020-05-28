@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Autocompleter custom element use case</title>
+    <script src="index.js"></script>
+    <style>
+    body { font: normal 16px/1.5 Arial, sans-serif; }
+    svelte-autocompleter {
+      --input-border-color: blue;
+      --input-background-color: aqua;
+      --list-border-color: red;
+      --listitem-border-color: red;
+      --listitem-background-color: lightpink;
+      --listitem-highlighted-background-color: red;
+      --max-height: 150px;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>Autocompleter custom element use case</h1>
+    <p>
+    Country selected:
+    <strong id="selected_country_code">
+      France / FRA
+    </strong>
+    </p>
+    <p>
+    <svelte-autocompleter id="country_code_autocompleter"
+      show="France"
+      output="FRA"
+      name="country_code"/>
+    </p>
+    <script>
+      ac = document.querySelector('#country_code_autocompleter');
+      ac.renderlistitem = (item) => (`${item.name} (${item.alpha3Code}) <i>${item.nativeName}</i>`);
+      ac.datasource = (value) => (new Request(`https://restcountries.eu/rest/v2/name/${value}`));
+      ac.onselected = (item) => ({show: item.name, output: item.alpha3Code});
+      ac.onkeyupfilter = (item, value) => (
+        item.alpha3Code === value.toUpperCase()
+        || item.name.toLowerCase().includes(value.toLowerCase())
+      );
+      ac.addEventListener('AUTOCOMPLETER:SELECTED', function(e) {
+        sc = document.querySelector('#selected_country_code');
+        sc.innerText = Object.values(e.detail).join(' / ');
+      });
+      ac.addEventListener('AUTOCOMPLETER:CLEARED', function(e) {
+        sc = document.querySelector('#selected_country_code');
+        sc.innerText = 'none';
+      });
+    </script>
+  </body>
+</html>
