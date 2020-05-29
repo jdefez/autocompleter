@@ -306,7 +306,7 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (210:2) {#each dataList as item, i }
+// (212:2) {#each dataList as item, i }
 function create_each_block(ctx) {
 	let span;
 	let html_tag;
@@ -556,6 +556,8 @@ function instance($$self, $$props, $$invalidate) {
 			reset();
 			$$invalidate(0, output = "");
 			host.dispatchEvent(new CustomEvent("AUTOCOMPLETER:CLEARED"));
+		} else {
+			reset();
 		}
 	};
 
@@ -716,7 +718,7 @@ function instance($$self, $$props, $$invalidate) {
 class Autocompleter extends SvelteElement {
 	constructor(options) {
 		super();
-		this.shadowRoot.innerHTML = `<style>:host{all:initial;display:block;position:relative;box-sizing:border-box}:host(.inline){display:inline-block}:host>input{box-sizing:border-box;display:block;width:100%;max-width:100%;margin:0;padding:5px;border-width:var(--input-border-width, 1px);border-style:var(--input-border-style, solid);border-color:var(--input-border-color, #cccccc);border-radius:var(--input-border-radius, 0 0 0 0);background-color:var(--input-background-color, white)}.list,.list-item{box-sizing:border-box;display:block}:host>.list{position:absolute;top:100%;width:100%;max-width:100%;border-width:var(--list-border-width, 1px);border-style:var(--list-border-style, solid);border-color:var(--list-border-color, #cccccc);border-radius:var(--list-border-radius, 0 0 0 0);max-height:var(--list-max-height, 250px);overflow-y:scroll}:host .list-item{padding:var(--listitem-padding, 5px);background-color:var(--listitem-background-color, white);width:100%;cursor:pointer}:host .list-item+.list-item{border-width:var(--listitem-border-width, 1px 0 0 0);border-style:var(--listitem-border-style, solid);border-color:var(--listitem-border-color, #cccccc)}.list.is--hidden{visibility:hidden}.list-item.is--highlighted{background-color:var(--listitem-highlighted-background-color, #eeeeee)}</style>`;
+		this.shadowRoot.innerHTML = `<style>:host{all:initial;display:block;position:relative;box-sizing:border-box}:host(.inline){display:inline-block}:host>input{box-sizing:border-box;display:block;width:100%;max-width:100%;margin:0;padding:5px;border-width:var(--input-border-width, 1px);border-style:var(--input-border-style, solid);border-color:var(--input-border-color, #cccccc);border-radius:var(--input-border-radius, 0 0 0 0);background:var(--input-background, white);color:inherit;font:inherit}.list,.list-item{box-sizing:border-box;display:block}:host>.list{position:absolute;top:100%;width:100%;max-width:100%;border-width:var(--list-border-width, 1px);border-style:var(--list-border-style, solid);border-color:var(--list-border-color, #cccccc);border-radius:var(--list-border-radius, 0 0 0 0);max-height:var(--list-max-height, 250px);overflow-y:scroll}:host .list-item{padding:var(--listitem-padding, 5px);background-color:var(--listitem-background-color, white);width:100%;cursor:pointer}:host .list-item+.list-item{border-width:var(--listitem-border-width, 1px 0 0 0);border-style:var(--listitem-border-style, solid);border-color:var(--listitem-border-color, #cccccc)}.list.is--hidden{visibility:hidden}.list-item.is--highlighted{background-color:var(--listitem-highlighted-background-color, #eeeeee)}</style>`;
 
 		init(
 			this,

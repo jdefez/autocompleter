@@ -4,34 +4,51 @@
     <title>Autocompleter custom element use case</title>
     <script src="index.js"></script>
     <style>
-    body { font: normal 16px/1.5 Arial, sans-serif; }
+    body {
+      font: bold 16px/1.5 sans-serif;
+      color: #f08080;
+      margin: 16px;
+      background-color: #c8ebd0;
+    }
     svelte-autocompleter {
-      --input-border-color: lightblue;
-      --input-background-color: #f8fcfd;
+      color: inherit;
+      font: inherit;
+      --input-border-color: #add8e6;
+      --input-background: #f8fcfd url('search-outline.svg') no-repeat center right 5px/4%;
       --input-border-radius: 3px;
-      --list-border-color: lightblue;
+      --list-border-color: #add8e6;
       --list-border-radius: 3px;
-      --listitem-border-color: lightblue;
+      --listitem-border-color: #add8e6;
       --listitem-background-color: #f8fcfd;
-      --listitem-highlighted-background-color: lightblue;
+      --listitem-highlighted-background-color: #eef9f0;
       --max-height: 150px;
     }
     form {
       display: grid;
-      grid-template-columns: repeat(1fr, 2);
+      grid-template-columns: repeat(2, 1fr);
+      grid-column-gap: 16px;
       grid-auto-flow: column;
+    }
+    fieldset {
+      box-sizing: border-box;
+      padding-right: 16px;
+      padding-left: 16px;
+      border-width: 0;
+      border-radius: 8px;
+      background-color: #e3f3f6;
     }
     </style>
   </head>
   <body>
-    <h1>Autocompleter custom element use case</h1>
+    <h1>Autocompleter</h1>
+    <p>Custom element use case</p>
     <form action="">
       <fieldset>
         <p>
         Country selected:
-        <strong id="selected_country_code">
+        <span id="selected_country_code">
           France / FRA
-        </strong>
+        </span>
         </p>
         <p>
         <svelte-autocompleter id="country_code_autocompleter"
@@ -43,7 +60,7 @@
       <fieldset>
         <p>
         Animal selected:
-        <strong id="selected_animal"></strong>
+        <span id="selected_animal">none</span>
         </p>
         <p>
         <svelte-autocompleter id="animal_autocompleter"
@@ -73,17 +90,23 @@
 
       ac = document.querySelector('#animal_autocompleter');
       ac.renderlistitem = (item) => (`${item}`);
-      ac.datasource = (value) => ['pinguin', 'bear', 'dog', 'cat', 'elephant', 'bull'];
+      ac.datasource = (value) => [
+        'pinguin', 'panda', 'parot', 'bear', 'dog', 'cat', 'elephant', 'bull'
+      ];
       ac.onselected = (item) => ({show: item, output: item});
       ac.onkeyupfilter = (item, value) => item.includes(value);
       ac.addEventListener('AUTOCOMPLETER:SELECTED', function(e) {
         sc = document.querySelector('#selected_animal');
-        sc.innerText = e.detail.output;
+        sc.innerText = capitalize(e.detail.output);
       });
       ac.addEventListener('AUTOCOMPLETER:CLEARED', function(e) {
         el = document.querySelector('#selected_animal');
         el.innerText = 'none';
       });
+      const capitalize = (s) => {
+        if (typeof s !== 'string') return ''
+        return s.charAt(0).toUpperCase() + s.slice(1)
+      }
     </script>
   </body>
 </html>
