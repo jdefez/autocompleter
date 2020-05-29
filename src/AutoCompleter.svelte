@@ -102,6 +102,8 @@
       output = '';
 
       host.dispatchEvent(new CustomEvent('AUTOCOMPLETER:CLEARED'));
+    } else {
+      reset();
     }
   }
 
