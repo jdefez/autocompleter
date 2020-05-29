@@ -224,9 +224,7 @@
     position: relative;
     box-sizing: border-box;
   }
-  :host(.inline) {
-    display: inline-block;
-  }
+  :host(.inline) { display: inline-block; }
   :host > input {
     box-sizing: border-box;
     display: block;
@@ -238,7 +236,9 @@
     border-style: var(--input-border-style, solid);
     border-color: var(--input-border-color, #cccccc);
     border-radius: var(--input-border-radius, 0 0 0 0);
-    background-color: var(--input-background-color, white);
+    background: var(--input-background, white);
+    color: inherit;
+    font: inherit;
   }
   .list,
   .list-item {
