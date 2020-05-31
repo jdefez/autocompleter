@@ -240,6 +240,7 @@
     background: var(--input-background, white);
     color: inherit;
     font: inherit;
+    outline: none;
   }
   :host >input::placeholder {
     font: var(--input-placeholder-font, inherit);
