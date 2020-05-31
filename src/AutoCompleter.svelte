@@ -1,38 +1,35 @@
+<svelte:options tag="svelte-autocompleter"/>
 <script>
-  import AutocompleterInput from './AutocompleterInput.svelte';
-  import { onMount } from 'svelte';
+  import { get_current_component } from 'svelte/internal';
 
-  export let onkeyupfilter = (item, show) => item.includes(show);
+  export let renderlistitem = (item) => item;
+  export let onkeyupfilter = (item) => item.includes(show);
   export let onselected = (item) => { return {'show': item, 'output': item}; };
-  export let oncleared = null;
 
+  export let placeholder = 'Enter some key words ...';
   export let datasource = null;
   export let output = null;
   export let show = null;
   export let name = null;
 
   let listElement = null;
-  onMount(() => {
-    listElement = document.querySelector('.autocompleter__list');
-
-  });
   let dataList = [];
   let index = 0;
+  let host = get_current_component();
 
   const dataSourceIsRequest = () => {
     if (typeof datasource === 'function') {
-      try {
-        const source = datasource(show);
-        if (!source instanceof Request) {
-          throw '@param datasource has to be a Request object';
-        }
-        return true;
-      } catch (e) {
-        console.error(e);
-        return false;
-      }
+      const source = datasource(show);
+      return source instanceof Request;
     }
   };
+
+  const dataSourceIsArray = () => {
+    if (typeof datasource === 'function') {
+      const source = datasource();
+      return Array.isArray(source);
+    }
+  }
 
   const select = () => {
     try {
@@ -49,6 +46,11 @@
       output = selected.output;
       reset();
 
+      host.dispatchEvent(new CustomEvent(
+        'AUTOCOMPLETER:SELECTED',
+        {detail: {show, output}}
+      ));
+
     } catch (e) {
       console.error(e);
     }
@@ -58,29 +60,8 @@
     const target = event.target;
     const elements = listElement.childNodes;
     index = Array.prototype.indexOf.call(elements, target);
-    dispatch('autocompleterSelect');
+    return select();
   }
-
-  const keyup = () => {
-    if (dataSourceIsRequest()) {
-      fetch(datasource(show))
-        .then((response) => response.json())
-        .then((json) => {
-          if (!json || !Array.isArray(json)) {
-            json = [];
-          }
-          dataList = json
-        })
-        .catch((error) => console.log(error));
-    } else {
-      if (dataList && !dataList.length) {
-        dataList = datasource;
-      }
-      if (dataList && dataList.length && typeof onkeyupfilter === 'function') {
-        dataList = dataList.filter((item) => onkeyupfilter(item, show));
-      }
-    }
-  };
 
   const reset = () => {
     dataList = [];
@@ -88,13 +69,73 @@
   }
 
   const clear = () => {
-    reset();
-    output = '';
-    if (typeof oncleared === 'function') {
-      oncleared();
+    if (show !== '') {
+      show = '';
+      reset();
+      output = '';
+
+      host.dispatchEvent(new CustomEvent('AUTOCOMPLETER:CLEARED'));
+    } else {
+      reset();
     }
   }
 
+  const keyup = () => {
+    if (dataSourceIsRequest()) {
+      dataList = [];
+      fetch(datasource(show))
+        .then((response) => response.json())
+        .then((json) => {
+          if (!json || !Array.isArray(json)) {
+            json = [];
+          }
+          if (typeof onkeyupfilter === 'function') {
+            dataList = json.filter((item) => onkeyupfilter(item, show));
+          } else {
+            dataList = json;
+          }
+        })
+        .catch((error) => console.log(error));
+
+    } else if (dataSourceIsArray()) {
+      if (dataList.length === 0) {
+        dataList = datasource();
+      }
+      if (typeof onkeyupfilter === 'function') {
+        dataList = dataList.filter((item) => onkeyupfilter(item, show));
+      }
+    }
+  };
+
+  const handleKeyup = (event) => {
+    const key = event.key;
+    if (!['Enter', 'Escape', 'ArrowDown', 'ArrowUp'].includes(key)) {
+      if (show) {
+        keyup();
+      } else {
+        clear();
+      }
+    }
+  }
+
+  const handleKeydown = (event) => {
+    const key = event.key;
+    if (!show || ['Alt', 'Meta', 'Control'].includes(key)) {
+      return;
+    }
+
+    if (key === 'Enter') {
+      select();
+    } else if (key === 'Escape') {
+      clear();
+    } else if (key === 'ArrowDown') {
+      next();
+    } else if (key === 'ArrowUp') {
+      previous();
+    }
+  }
+
+  // List navigation
   const next = () => {
     const lastIndex = listElement.childNodes.length - 1;
     if (index + 1 <= lastIndex) {
@@ -146,62 +187,101 @@
   const scrollToPrevious = (index) => {
     return scrollTo(index, 'previous');
   }
+
+  // List item
+  const renderListItemContent = (template, data) => {
+    if (!template && typeof data === 'string') {
+      return data;
+    } else if (typeof template === 'function') {
+      return template(data);
+    }
+  };
 </script>
-<span class="autocompleter">
-  <AutocompleterInput {name}
-    bind:show={show}
-    bind:output={output}
-    on:autocompleterSelectPrevious={previous}
-    on:autocompleterSelectNext={next}
-    on:autocompleterSelect={select}
-    on:autocompleterKeyup={keyup}
-    on:autocompleterClear={clear}/>
-    {#if dataList && dataList.length }
-    <span class="autocompleter__list"
-      class:is--hidden={dataList.length === 0}>
-      {#each dataList as item, i }
-      <span class="autocompleter__list_item"
-        class:is--highlighted={i === index}
-        on:click={click}>
-        <slot name="list-item" {item}></slot>
-      </span>
-      {/each}
-    </span>
-    {/if}
+<input placeholder={placeholder}
+  on:keydown={handleKeydown}
+  on:keyup={handleKeyup}
+  bind:value={show}
+  name="autocompleter__input"
+  type="text">
+<input type="hidden"
+  name={name}
+  output={output}>
+<span class="list"
+  bind:this={listElement}
+  class:is--hidden={dataList.length === 0}>
+  {#each dataList as item, i }
+  <span class="list-item"
+    class:is--highlighted={i === index}
+    on:click={click}>
+    {@html renderListItemContent(renderlistitem, item)}
+  </span>
+  {/each}
 </span>
 <style type="text/css">
-  .autocompleter {
+  :host {
+    all: initial;
+    display: block;
     position: relative;
     box-sizing: border-box;
-    display: block;
   }
-  .autocompleter__list,
-  .autocompleter__list_item {
+  :host(.inline) { display: inline-block; }
+  :host > input {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 5px;
+    border-width: var(--input-border-width, 1px);
+    border-style: var(--input-border-style, solid);
+    border-color: var(--input-border-color, #cccccc);
+    border-radius: var(--input-border-radius, 0 0 0 0);
+    background: var(--input-background, white);
+    color: inherit;
+    font: inherit;
+    outline: none;
+  }
+  :host >input::placeholder {
+    font: var(--input-placeholder-font, inherit);
+    color: var(--input-placeholder-color, inherit);
+  }
+  .list,
+  .list-item {
     box-sizing: border-box;
     display: block;
   }
-  .autocompleter__list {
+  :host > .list {
     position: absolute;
-    top: 100%;
+    top: calc(100% - 1px);
     width: 100%;
     max-width: 100%;
-    border: 1px solid #ccc;
-    background-color: white;
-    max-height: 250px;
+    border-width: var(--list-border-width, 1px);
+    border-style: var(--list-border-style, solid);
+    border-color: var(--list-border-color, #cccccc);
+    border-radius: var(--list-border-radius, 0 0 0 0);
+    max-height: var(--list-max-height, 250px);
     overflow-y: scroll;
-
+    box-shadow: 0 1px 5px hsla(1, 0%, 0%, 0.05),
+      0 3px 7px hsla(1, 0%, 0%, 0.05),
+      0 5px 9px hsla(1, 0%, 0%, 0.05),
+      0 7px 11px hsla(1, 0%, 0%, 0.05);
   }
-  .autocompleter__list.is--hidden {
-    visibility: hidden;
-  }
-  .autocompleter__list_item {
-    padding: 5px;
+  :host .list-item {
+    padding: var(--listitem-padding, 5px);
+    background-color: var(--listitem-background-color, white);
+    font: var(--listitem-font, inherit);
+    color: var(--listitem-color, inherit);
     width: 100%;
+    cursor: pointer;
   }
-  .autocompleter__list_item + .autocompleter__list_item {
-    border-top: 1px solid #ccc;
+  :host .list-item + .list-item {
+    border-width: var(--listitem-border-width, 1px 0 0 0);
+    border-style: var(--listitem-border-style, solid);
+    border-color: var(--listitem-border-color, #cccccc);
   }
-  .autocompleter__list_item.is--highlighted {
-    background-color: #eee;
+  .list.is--hidden { visibility: hidden; }
+  :host .list-item.is--highlighted {
+    background-color: var(--listitem-highlighted-background-color, #eeeeee);
+    font: var(--listitem-highlighted-font, inherit);
   }
 </style>
