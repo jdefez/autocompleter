@@ -4,31 +4,40 @@
     <title>Autocompleter custom element use case</title>
     <script src="index.js"></script>
     <style>
-    body {
-      font: bold 16px/1.5 sans-serif;
-      color: #f08080;
-      margin: 16px;
-      background-color: #c8ebd0;
-    }
     svelte-autocompleter {
       color: inherit;
       font: inherit;
+      --input-placeholder-color: #add8e6;
+      --input-placeholder-font: oblique normal 100 14px/1.5 sans-serif;
+      --input-border-radius: 3px;
       --input-border-color: #add8e6;
       --input-background: #f8fcfd url('search-outline.svg') no-repeat center right 5px/4%;
-      --input-border-radius: 3px;
-      --input-placeholder-font: oblique normal 100 14px/1.5 sans-serif;
-      --input-placeholder-color: #add8e6;
-      --list-border-color: #add8e6;
       --list-border-radius: 3px;
-      --listitem-border-color: #add8e6;
-      --listitem-background-color: #f8fcfd;
+      --list-border-color: #add8e6;
       --listitem-highlighted-background-color: #eef9f0;
+      --listitem-highlighted-font: normal normal 900 14px/1.5 sans-serif;
+      --listitem-background-color: #f8fcfd;
+      --listitem-border-color: #add8e6;
+      --listitem-color: #add8e6;
+      --listitem-font: oblique normal 300 14px/1.5 sans-serif;
       --max-height: 150px;
     }
-    p, h1, fieldset { margin: 0; }
-    * + *,
-    form { margin-top: 15px; }
-
+    body {
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      margin: 16px;
+      font: bold 16px/1.5 sans-serif;
+      color: #f08080;
+      background: linear-gradient( lightyellow, #c8ebd0) no-repeat;
+    }
+    main {
+      display: block;
+      width: 80vw;
+    }
+    p, h1, main, fieldset { margin: 0; }
+    * + * { margin-top: 30px; }
     form {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -41,54 +50,53 @@
       padding-left: 16px;
       border-width: 0;
       border-radius: 8px;
-      background-color: #e3f3f6;
+      background-color: lightyellow;
     }
-    .note {
-      font-size: 0.8em;
-      font-style: oblique;
-      font-weight: 100;
-    }
+    fieldset * + * { margin-top: 7px; }
+    .note { font: oblique normal 100 0.8em/1.5 sans-serif; }
     </style>
   </head>
   <body>
-    <h1>Autocompleter</h1>
-    <p>Custom element use case</p>
-    <form action="">
-      <fieldset>
-        <p>
-        Country selected:
-        <span id="selected_country_code">
-          France / FRA
-        </span>
-        </p>
-        <p>
-        <svelte-autocompleter id="country_code_autocompleter"
-          show="France"
-          output="FRA"
-          name="country_code"/>
-        </p>
-        <p class="note">
-          Datas fetched by using
-          <a href="https://restcountries.eu/"
-            target="_blank">
-            restcountries.eu
-          </a>
-          A.P.I
-        </p>
-      </fieldset>
-      <fieldset>
-        <p>
-        Animal selected:
-        <span id="selected_animal">none</span>
-        </p>
-        <p>
-        <svelte-autocompleter id="animal_autocompleter"
-          show=""
-          output=""
-          name="animal"/>
-        </p>
-      </fieldset>
-    </form>
+    <main>
+      <h1>Autocompleter</h1>
+      <p>Custom element use case</p>
+      <form action="">
+        <fieldset>
+          <p>
+          Country selected:
+          <span id="selected_country_code">
+            France / FRA
+          </span>
+          </p>
+          <p>
+          <svelte-autocompleter id="country_code_autocompleter"
+            show="France"
+            output="FRA"
+            name="country_code"/>
+          </p>
+          <p class="note">
+            Datas fetched by using
+            <a href="https://restcountries.eu/"
+              target="_blank">
+              restcountries.eu
+            </a>
+            A.P.I
+          </p>
+        </fieldset>
+        <fieldset>
+          <p>
+          Animal selected:
+          <span id="selected_animal">none</span>
+          </p>
+          <p>
+          <svelte-autocompleter id="animal_autocompleter"
+            show=""
+            output=""
+            name="animal"/>
+          </p>
+        </fieldset>
+      </form>
+    </main>
     <script>
       cc = document.querySelector('#country_code_autocompleter');
       cc.renderlistitem = (item) => (`${item.name} (${item.alpha3Code}) <i>${item.nativeName}</i>`);
@@ -108,7 +116,7 @@
       });
 
       ac = document.querySelector('#animal_autocompleter');
-      ac.renderlistitem = (item) => (`${item}`);
+      ac.renderlistitem = (item) => (`${capitalize(item)}`);
       ac.datasource = (value) => [
         'pinguin', 'panda', 'parot', 'bear', 'dog', 'cat', 'elephant', 'bull'
       ];

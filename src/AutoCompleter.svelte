@@ -252,7 +252,7 @@
   }
   :host > .list {
     position: absolute;
-    top: 100%;
+    top: calc(100% - 1px);
     width: 100%;
     max-width: 100%;
     border-width: var(--list-border-width, 1px);
@@ -261,10 +261,16 @@
     border-radius: var(--list-border-radius, 0 0 0 0);
     max-height: var(--list-max-height, 250px);
     overflow-y: scroll;
+    box-shadow: 0 1px 5px hsla(1, 0%, 0%, 0.05),
+      0 3px 7px hsla(1, 0%, 0%, 0.05),
+      0 5px 9px hsla(1, 0%, 0%, 0.05),
+      0 7px 11px hsla(1, 0%, 0%, 0.05);
   }
   :host .list-item {
     padding: var(--listitem-padding, 5px);
     background-color: var(--listitem-background-color, white);
+    font: var(--listitem-font, inherit);
+    color: var(--listitem-color, inherit);
     width: 100%;
     cursor: pointer;
   }
@@ -276,5 +282,6 @@
   .list.is--hidden { visibility: hidden; }
   :host .list-item.is--highlighted {
     background-color: var(--listitem-highlighted-background-color, #eeeeee);
+    font: var(--listitem-highlighted-font, inherit);
   }
 </style>
