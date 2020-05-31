@@ -63,6 +63,23 @@
     return select();
   }
 
+  const reset = () => {
+    dataList = [];
+    index = 0;
+  }
+
+  const clear = () => {
+    if (show !== '') {
+      show = '';
+      reset();
+      output = '';
+
+      host.dispatchEvent(new CustomEvent('AUTOCOMPLETER:CLEARED'));
+    } else {
+      reset();
+    }
+  }
+
   const keyup = () => {
     if (dataSourceIsRequest()) {
       dataList = [];
@@ -89,23 +106,6 @@
       }
     }
   };
-
-  const reset = () => {
-    dataList = [];
-    index = 0;
-  }
-
-  const clear = () => {
-    if (show !== '') {
-      show = '';
-      reset();
-      output = '';
-
-      host.dispatchEvent(new CustomEvent('AUTOCOMPLETER:CLEARED'));
-    } else {
-      reset();
-    }
-  }
 
   const handleKeyup = (event) => {
     const key = event.key;
@@ -138,6 +138,7 @@
   // List navigation
   const next = () => {
     const lastIndex = listElement.childNodes.length - 1;
+
     if (index + 1 <= lastIndex) {
       index++;
       listElement.scrollTop = scrollToNext(index);
@@ -270,7 +271,7 @@
   }
 
   .list.is--hidden { visibility: hidden; }
-  .list-item.is--highlighted {
+  :host .list-item.is--highlighted {
     background-color: var(--listitem-highlighted-background-color, #eeeeee);
   }
 </style>
