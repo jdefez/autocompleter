@@ -306,7 +306,7 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (213:2) {#each dataList as item, i }
+// (212:2) {#each dataList as item, i }
 function create_each_block(ctx) {
 	let span;
 	let html_tag;
@@ -576,7 +576,7 @@ function instance($$self, $$props, $$invalidate) {
 	const handleKeydown = event => {
 		const key = event.key;
 
-		if (["Alt", "Meta", "Control"].includes(key)) {
+		if (!show || ["Alt", "Meta", "Control"].includes(key)) {
 			return;
 		}
 

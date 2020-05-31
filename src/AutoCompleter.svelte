@@ -120,7 +120,7 @@
 
   const handleKeydown = (event) => {
     const key = event.key;
-    if (['Alt', 'Meta', 'Control'].includes(key)) {
+    if (!show || ['Alt', 'Meta', 'Control'].includes(key)) {
       return;
     }
 
@@ -138,7 +138,6 @@
   // List navigation
   const next = () => {
     const lastIndex = listElement.childNodes.length - 1;
-
     if (index + 1 <= lastIndex) {
       index++;
       listElement.scrollTop = scrollToNext(index);
