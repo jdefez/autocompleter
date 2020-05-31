@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rollup -c",
+    "serve": "http-server -p 8080 -c-1 dist/",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
