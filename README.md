@@ -1,7 +1,6 @@
 This is a attempt to build a web component from svelte
 
 ## Commands
-build: `npm run build`
 start server: `npm run serve`
 
 ## Reading list
