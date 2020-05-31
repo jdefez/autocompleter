@@ -241,6 +241,10 @@
     color: inherit;
     font: inherit;
   }
+  :host >input::placeholder {
+    font: var(--input-placeholder-font, inherit);
+    color: var(--input-placeholder-color, inherit);
+  }
   .list,
   .list-item {
     box-sizing: border-box;
