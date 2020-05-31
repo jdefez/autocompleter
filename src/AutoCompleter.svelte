@@ -273,7 +273,6 @@
     border-style: var(--listitem-border-style, solid);
     border-color: var(--listitem-border-color, #cccccc);
   }
-
   .list.is--hidden { visibility: hidden; }
   :host .list-item.is--highlighted {
     background-color: var(--listitem-highlighted-background-color, #eeeeee);
